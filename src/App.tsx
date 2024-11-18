@@ -11,9 +11,7 @@ export function App() {
     return items.filter(
       (item) =>
         item.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        item.abilities.some((ability) =>
-          ability.description.toLowerCase().includes(debouncedSearch),
-        ),
+        item.texts.some((text) => text.toLowerCase().includes(debouncedSearch)),
     )
   }, [items, debouncedSearch])
 

@@ -1,10 +1,13 @@
 import type { Tier } from '../data/types.ts'
 
 export const colors = {
+  ammo: 'text-orange-400',
   burn: 'text-orange-400',
   damage: 'text-red-400',
-  haste: 'text-cyan-400',
+  haste: 'text-teal-400',
   poison: 'text-green-400',
+  shield: 'text-yellow-300',
+  slow: 'text-[#b7a084]',
 } as const
 
 export const bgColors = {

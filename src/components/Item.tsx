@@ -1,8 +1,8 @@
 import React, { memo, useState } from 'react'
 import type { Item } from '../data/types.ts'
-import { AbilityText } from './AbilityText.tsx'
-import { ArrowBigRight } from 'lucide-react'
 import { getTierBg } from '../util/colors.ts'
+import { PiArrowFatRightDuotone } from 'react-icons/pi'
+import { ItemText } from './ItemText.tsx'
 
 interface Props {
   item: Item
@@ -53,12 +53,12 @@ function ItemComponentNoMemo({ item }: Props) {
             })}
           </div>
           <div className="flex flex-col gap-1 text-sm">
-            {item.abilities.map((ability, idx) => (
+            {item.texts.map((text, idx) => (
               <div key={idx} className="flex gap-1">
                 <div className="pt-[3px]">
-                  <ArrowBigRight fill="#69553a" stroke="black" strokeWidth={1} size={16} />
+                  <PiArrowFatRightDuotone fill="#69553a" size={16} />
                 </div>
-                <AbilityText ability={ability} tier={curTier} tiers={item.tiers} />
+                <ItemText item={item} text={text} tier={curTier} />
               </div>
             ))}
           </div>

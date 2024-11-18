@@ -4,7 +4,7 @@ import { glob } from 'glob'
 import yaml from 'js-yaml'
 import path from 'path'
 import nodeCmd from 'node-cmd'
-import type { Ability, ActionType, Item, Tier } from '../src/data/types.ts'
+import type { ActionType, Item, Tier } from '../src/data/types.ts'
 
 const dirname = getDirname(import.meta.url)
 const exportDir = `${dirname}/../export`
@@ -62,7 +62,7 @@ interface CardData {
   Localization: {
     Title?: { Text: string }
     Tooltips: Array<{
-      Content?: { Key: string; Text: string }
+      Content: { Key: string; Text: string }
     }>
   }
 }
@@ -115,17 +115,15 @@ let usedIds = new Set()
 
 fs.mkdirSync(`${dirname}/../public/images/cards`, { recursive: true })
 
-function parseAbility(ability: CardDataAbility, abilityIdx: number, itemData: CardData): Ability {
-  const shortKey = ability.TranslationKey.substring(0, 10)
-  const tooltip = itemData.Localization.Tooltips.find(
-    ({ Content }, idx) => idx >= abilityIdx && Content?.Key.startsWith(shortKey),
-  )
-
-  return {
-    description: tooltip?.Content?.Text ?? ability.InternalDescription,
-    priority: ability.Priority,
-    Action: ability.Action,
+function parseTexts(itemData: CardData) {
+  let usedKeys = new Set<string>()
+  let texts: string[] = []
+  for (const { Content } of itemData.Localization.Tooltips) {
+    if (usedKeys.has(Content.Key)) continue
+    usedKeys.add(Content.Key)
+    texts.push(Content.Text)
   }
+  return texts
 }
 
 for (const cardAssetFile of cardAssetFiles) {
@@ -179,13 +177,17 @@ for (const cardAssetFile of cardAssetFiles) {
     nodeCmd.runSync(command)
   }
 
+  if (itemData.Localization.Tooltips.some((tooltip) => !tooltip.Content)) {
+    console.error(`Tooltips missing for ${itemData.InternalName}`)
+    continue
+  }
+
   items.push({
     id,
     name: itemData.Localization.Title?.Text ?? itemData.InternalName,
     size: itemData.Size === 'Small' ? 1 : itemData.Size === 'Medium' ? 2 : 3,
-    abilities: Object.values(itemData.Abilities).map((ability, idx) =>
-      parseAbility(ability, idx, itemData),
-    ),
+    texts: parseTexts(itemData),
+    abilities: Object.values(itemData.Abilities).map((ability) => ({ Action: ability.Action })),
     tiers: Object.entries(itemData.Tiers).map(([tier, tierData]) => ({
       tier: tier as Tier,
       attributes: tierData.Attributes,
@@ -196,4 +198,4 @@ for (const cardAssetFile of cardAssetFiles) {
 }
 
 fs.writeFileSync(`${dirname}/../src/data/items.json`, JSON.stringify(items))
-console.log(`Found ${found}/${potential} cards`)
+console.log(`Parsed ${found}/${potential} cards`)

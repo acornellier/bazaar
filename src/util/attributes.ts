@@ -6,9 +6,11 @@ import type {
   Tier,
   TierData,
 } from '../data/types.ts'
-import type { Keyword } from '../data/keywords.ts'
-import { ClockIcon } from 'lucide-react'
 import { colors } from './colors.ts'
+import { IoShieldHalfOutline, IoStopwatchOutline } from 'react-icons/io5'
+import { FaBurst } from 'react-icons/fa6'
+import { ImFire } from 'react-icons/im'
+import { GiHeavyBullets } from 'react-icons/gi'
 
 export type ActionTypeModifiers = { [key in ActionTypeModifier]?: Attribute }
 
@@ -37,7 +39,7 @@ export function getActionTypeModifiers(actionType: ActionType): ActionTypeModifi
     case 'TActionPlayerPoisonApply':
       return { empty: 'PoisonApplyAmount' }
     case 'TActionPlayerBurnApply':
-      return { empty: 'DamageAmount' }
+      return { empty: 'BurnApplyAmount' }
     case 'TActionPlayerCardAttribute':
       return { empty: 'Custom_0' } // TODO: incorrect
     case 'TActionPlayerModifyAttribute':
@@ -58,13 +60,39 @@ type AttributeFormatting = {
 }
 
 const attributeFormattings: { [key in Attribute]?: AttributeFormatting } = {
+  BurnApplyAmount: {
+    color: colors.burn,
+    Icon: ImFire,
+  },
+  ChargeAmount: {
+    color: colors.damage,
+    ms: true,
+    Icon: FaBurst,
+  },
+  DamageAmount: {
+    color: colors.damage,
+    Icon: FaBurst,
+  },
   HasteAmount: {
     color: colors.haste,
     ms: true,
-    Icon: ClockIcon,
+    Icon: IoStopwatchOutline,
   },
   PoisonApplyAmount: {
     color: colors.poison,
+  },
+  ReloadAmount: {
+    color: colors.ammo,
+    Icon: GiHeavyBullets,
+  },
+  ShieldApplyAmount: {
+    color: colors.shield,
+    Icon: IoShieldHalfOutline,
+  },
+  SlowAmount: {
+    color: colors.slow,
+    ms: true,
+    Icon: IoStopwatchOutline,
   },
 }
 
@@ -91,13 +119,4 @@ export function getAttributeData(
   }
 
   return null
-}
-
-export const keywordColors: Record<Keyword, string> = {
-  Aquatic: 'text-indigo-300',
-  Burn: colors.burn,
-  Damage: colors.damage,
-  Haste: colors.haste,
-  Poison: colors.poison,
-  Weapon: 'text-indigo-300',
 }

@@ -1,6 +1,4 @@
-﻿import * as react from 'react'
-import { type ForwardRefExoticComponent } from 'react'
-import type { LucideProps } from 'lucide-react'
+﻿import type { IconType } from 'react-icons'
 
 export type Tier = 'Bronze' | 'Silver' | 'Gold' | 'Diamond'
 
@@ -25,6 +23,7 @@ export type Attribute =
   | 'DisableAmount'
   | 'DisableTargets'
   | 'PoisonApplyAmount'
+  | 'BurnApplyAmount'
   | 'Multicast'
   | 'Custom_0'
   | 'Custom_2'
@@ -57,11 +56,15 @@ export type Action = {
     $type: 'TFixedValue'
     Value: number
   }
+  SpawnContext?: {
+    Limit: {
+      $type: 'TFixedValue'
+      Value: number
+    }
+  }
 }
 
 export type Ability = {
-  description: string
-  priority: 'High' | 'Medium' | 'Low'
   Action: Action
 }
 
@@ -74,10 +77,9 @@ export type Item = {
   id: string
   name: string
   size: 1 | 2 | 3
+  texts: string[]
   abilities: Ability[]
   tiers: TierData[]
 }
 
-export type IconComponent = ForwardRefExoticComponent<
-  Omit<LucideProps, 'ref'> & react.RefAttributes<SVGSVGElement>
->
+export type IconComponent = IconType

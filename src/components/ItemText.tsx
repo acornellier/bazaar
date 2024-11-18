@@ -1,14 +1,19 @@
 import { type ActionTypeModifier, type Item, type Tier } from '../data/types.ts'
-import { getActionTypeModifiers, getAttributeData } from '../util/attributes.ts'
+import { getAttributeData } from '../util/attributes.ts'
 import { getKeyword, keywordColors, keywords } from '../data/keywords.ts'
 
 interface Props {
   item: Item
-  text: string
+  tooltip: string
   tier: Tier
 }
 
-const specialTextRegex = new RegExp(`(\{ability\..*\}|${keywords.join('|')})`, 'i')
+const specialTextRegex = new RegExp(
+  `(\{(?:ability|aura)\..*\}|${keywords.map((keyword) => `\\b${keyword}\\b`).join('|')})`,
+  'gi',
+)
+
+const buggedItems = ['Spices', 'Mothmeal']
 
 interface SectionTextProps extends Props {
   section: string
@@ -24,18 +29,22 @@ function SectionText({ item, tier, section }: SectionTextProps) {
     return <span className={`${keywordColors[keyword]}`}>{keyword}</span>
   }
 
-  const abilityMatch = section.match(/\{ability\.(\d)\.?(\w+)?\}/)
+  const abilityMatch = section.match(/\{(ability|aura)\.(\d)\.?(\w+)?(\|%)?\}/)
 
   if (abilityMatch === null) {
     console.error(`Variable does not match regex: ${section}`)
     return section
   }
 
-  const abilityIndex = Number(abilityMatch[1]!)
-  const ability = item.abilities[abilityIndex]
+  if (buggedItems.includes(item.name)) return section
+
+  const type = abilityMatch[1] as 'ability' | 'aura'
+  const abilityId = abilityMatch[2]
+  const array = type === 'ability' ? item.abilities : item.auras
+  const ability = array.find(({ Id }) => Id === abilityId)
 
   if (!ability) {
-    console.error(`Ability index ${abilityIndex} does not exist for item ${item.name}`)
+    console.error(`${type}.${abilityId} does not exist for item ${item.name}`)
     return section
   }
 
@@ -47,20 +56,11 @@ function SectionText({ item, tier, section }: SectionTextProps) {
     return <span>{ability.Action.SpawnContext?.Limit.Value}</span>
   }
 
-  const actionTypeModifiers = getActionTypeModifiers(ability.Action.$type)
-  const modifier = (abilityMatch[2] ?? 'empty') as ActionTypeModifier
+  const modifier = (abilityMatch[3] ?? 'empty') as ActionTypeModifier
 
-  const attribute = actionTypeModifiers[modifier]
-  if (!attribute) {
-    // console.error(
-    //   `Modifier ${modifier} missing for action ${ability.Action.$type} from "${section}" in "${ability.description}`,
-    // )
-    return section
-  }
-
-  const attributeData = getAttributeData(attribute, tier, item.tiers)
+  const attributeData = getAttributeData(ability, modifier, tier, item.tiers)
   if (!attributeData) {
-    console.error(`Item "${item.name}" attribute ${attribute} data not found`)
+    console.error(`Item "${item.name}" ability ${section} modifier "${modifier}" attribute data`)
     return section
   }
 
@@ -75,14 +75,14 @@ function SectionText({ item, tier, section }: SectionTextProps) {
   )
 }
 
-export function ItemText({ item, text, tier }: Props) {
-  const sections = text.split(specialTextRegex).filter(Boolean)
+export function ItemText({ item, tooltip, tier }: Props) {
+  const sections = tooltip.split(specialTextRegex).filter(Boolean)
 
   return (
     <span>
       {sections.map((section, idx) => (
         <span key={idx} className="font-bold">
-          <SectionText item={item} text={text} tier={tier} section={section} />
+          <SectionText item={item} tooltip={tooltip} tier={tier} section={section} />
         </span>
       ))}
     </span>

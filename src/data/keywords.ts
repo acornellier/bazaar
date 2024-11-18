@@ -1,15 +1,20 @@
 import { colors } from '../util/colors.ts'
 
+export const tags = ['Aquatic', 'Friend', 'Property', 'Tool', 'Vehicle', 'Weapon'] as const
+
 export const keywords = [
+  ...tags,
   'Ammo',
-  'Aquatic',
   'Burn',
+  'Crit Chance',
+  'Cooldown',
   'Damage',
+  'Freeze',
   'Haste',
+  'Heal',
   'Poison',
   'Shield',
   'Slow',
-  'Weapon',
 ] as const
 
 export type Keyword = (typeof keywords)[number]
@@ -19,13 +24,22 @@ export function getKeyword(str: string) {
 }
 
 export const keywordColors: Record<Keyword, string> = {
+  Aquatic: colors.tag,
+  Friend: colors.tag,
+  Property: colors.tag,
+  Tool: colors.tag,
+  Vehicle: colors.tag,
+  Weapon: colors.tag,
+
   Ammo: colors.ammo,
-  Aquatic: 'text-indigo-300',
   Burn: colors.burn,
+  'Crit Chance': colors.crit,
+  Cooldown: colors.haste,
   Damage: colors.damage,
   Haste: colors.haste,
+  Heal: colors.heal,
+  Freeze: colors.freeze,
   Poison: colors.poison,
   Shield: colors.shield,
   Slow: colors.slow,
-  Weapon: 'text-indigo-300',
 }

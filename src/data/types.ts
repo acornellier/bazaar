@@ -7,6 +7,7 @@ export type Attribute =
   | 'BuyPrice'
   | 'SellPrice'
   | 'DamageAmount'
+  | 'CritChance'
   | 'HasteAmount'
   | 'HasteTargets'
   | 'ReloadAmount'
@@ -47,14 +48,20 @@ export type ActionType =
   | 'TActionPlayerModifyAttribute'
   | 'TActionCardModifyAttribute'
   | 'TActionGameSpawnCards'
+  | 'TAuraActionCardModifyAttribute'
 
 export type ActionTypeModifier = 'empty' | 'targets' | 'mod' | 'ref'
 
 export type Action = {
   $type: ActionType
+  AttributeType?: Attribute
   Value?: {
-    $type: 'TFixedValue'
+    $type: 'TFixedValue' | string
     Value: number
+    AttributeType?: Attribute
+    Modifier?: {
+      Value: number
+    }
   }
   SpawnContext?: {
     Limit: {
@@ -65,20 +72,28 @@ export type Action = {
 }
 
 export type Ability = {
+  Id: string
   Action: Action
 }
 
 export type TierData = {
   tier: Tier
   attributes: Record<Attribute, number>
+  TooltipIds: number[]
+}
+
+export type Tooltip = {
+  text: string
+  type: 'Active' | 'Passive'
 }
 
 export type Item = {
   id: string
   name: string
   size: 1 | 2 | 3
-  texts: string[]
+  tooltips: Tooltip[]
   abilities: Ability[]
+  auras: Ability[]
   tiers: TierData[]
 }
 

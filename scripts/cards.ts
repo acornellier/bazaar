@@ -4,7 +4,7 @@ import { glob } from 'glob'
 import yaml from 'js-yaml'
 import path from 'path'
 import nodeCmd from 'node-cmd'
-import type { ActionType, Item, Tier } from '../src/data/types.ts'
+import type { Ability, ActionType, Attribute, Item, Tier, Tooltip } from '../src/data/types.ts'
 
 const dirname = getDirname(import.meta.url)
 const exportDir = `${dirname}/../export`
@@ -30,11 +30,27 @@ interface MatMeta {
 }
 
 interface CardDataAbility {
+  Id: string
   InternalDescription: string
   Priority: 'High' | 'Medium' | 'Low'
   TranslationKey: string
   Action: {
     $type: ActionType
+    AttributeType: string
+    Value: {
+      $type: 'TFixedValue' | string
+      Value: number
+      AttributeType?: Attribute
+      Modifier?: {
+        Value: number
+      }
+    }
+    SpawnContext: {
+      Limit: {
+        $type: 'TFixedValue'
+        Value: number
+      }
+    }
   }
 }
 
@@ -56,13 +72,16 @@ interface CardData {
     Tier,
     {
       Attributes: Record<string, number>
+      TooltipIds: string[]
     }
   >
   Abilities: Record<string, CardDataAbility>
+  Auras: Record<string, CardDataAbility>
   Localization: {
     Title?: { Text: string }
     Tooltips: Array<{
       Content: { Key: string; Text: string }
+      TooltipType: 'Active' | 'Passive'
     }>
   }
 }
@@ -117,13 +136,40 @@ fs.mkdirSync(`${dirname}/../public/images/cards`, { recursive: true })
 
 function parseTexts(itemData: CardData) {
   let usedKeys = new Set<string>()
-  let texts: string[] = []
-  for (const { Content } of itemData.Localization.Tooltips) {
+  let texts: Tooltip[] = []
+  for (const { TooltipType, Content } of itemData.Localization.Tooltips) {
     if (usedKeys.has(Content.Key)) continue
     usedKeys.add(Content.Key)
-    texts.push(Content.Text)
+    texts.push({ text: Content.Text, type: TooltipType })
   }
   return texts
+}
+
+function parseAbilities(abilities: Record<string, CardDataAbility>): Ability[] {
+  return Object.entries(abilities).map(([id, ability]) => ({
+    Id: id,
+    Action: {
+      $type: ability.Action.$type,
+      AttributeType: ability.Action.AttributeType as Attribute,
+      ...(ability.Action.Value
+        ? {
+            Value: {
+              $type: ability.Action.Value.$type,
+              Value: ability.Action.Value.Value,
+              AttributeType: ability.Action.Value.AttributeType,
+              Modifier: ability.Action.Value.Modifier,
+            },
+          }
+        : undefined),
+      ...(ability.Action.SpawnContext
+        ? {
+            SpawnContext: {
+              Limit: ability.Action.SpawnContext.Limit,
+            },
+          }
+        : undefined),
+    },
+  }))
 }
 
 for (const cardAssetFile of cardAssetFiles) {
@@ -186,11 +232,13 @@ for (const cardAssetFile of cardAssetFiles) {
     id,
     name: itemData.Localization.Title?.Text ?? itemData.InternalName,
     size: itemData.Size === 'Small' ? 1 : itemData.Size === 'Medium' ? 2 : 3,
-    texts: parseTexts(itemData),
-    abilities: Object.values(itemData.Abilities).map((ability) => ({ Action: ability.Action })),
+    tooltips: parseTexts(itemData),
+    abilities: parseAbilities(itemData.Abilities),
+    auras: parseAbilities(itemData.Auras),
     tiers: Object.entries(itemData.Tiers).map(([tier, tierData]) => ({
       tier: tier as Tier,
       attributes: tierData.Attributes,
+      TooltipIds: tierData.TooltipIds.map((id) => Number(id)),
     })),
   })
 

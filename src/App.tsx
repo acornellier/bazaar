@@ -11,7 +11,7 @@ export function App() {
     return items.filter(
       (item) =>
         item.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        item.texts.some((text) => text.toLowerCase().includes(debouncedSearch)),
+        item.tooltips.some(({ text }) => text.toLowerCase().includes(debouncedSearch)),
     )
   }, [items, debouncedSearch])
 
@@ -19,7 +19,7 @@ export function App() {
     <div className="flex flex-col gap-2 p-16">
       <input
         type="search"
-        placeholder="Search..."
+        placeholder={`Search ${items.length} items...`}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="text-black rounded-sm p-0.5"

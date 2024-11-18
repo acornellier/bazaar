@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  background-color: #242424;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  font-family: 'Roboto Slab Variable', serif;
+  color: white;
+}
+
+@mixin text-outline($size) {
+  text-shadow:
+    $size $size 0 #000,
+    (-$size) (-$size) 0 #000,
+    $size (-$size) 0 #000,
+    (-$size) $size 0 #000;
+}
+
+.text-outline {
+  @include text-outline(0.5px);
+}

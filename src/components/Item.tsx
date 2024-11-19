@@ -40,6 +40,15 @@ function ItemComponentNoMemo({ item }: Props) {
           }}
         />
         <div
+          className="absolute bottom-4 -left-3 h-6 w-12 object-fill bg-repeat-round rounded-2xl -rotate-12 
+                     flex items-center justify-center text-xl font-serif font-bold text-outline"
+          style={{
+            backgroundImage: `url(/images/price_tag.png)`,
+          }}
+        >
+          <span>{attributes.BuyPrice}</span>
+        </div>
+        <div
           className="h-full w-full object-fill bg-repeat-round rounded-2xl"
           style={{
             backgroundImage: `url(/images/cards/${item.id}.jpg)`,

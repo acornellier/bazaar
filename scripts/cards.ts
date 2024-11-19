@@ -6,6 +6,7 @@ import path from 'path'
 import nodeCmd from 'node-cmd'
 import type { Ability, ActionType, Attribute, Item, Tier, Tooltip } from '../src/data/types.ts'
 import type { Tag } from '../src/data/tags.ts'
+import type { Hero } from '../src/data/heroes.ts'
 
 const dirname = getDirname(import.meta.url)
 const exportDir = `${dirname}/../export`
@@ -230,6 +231,7 @@ for (const cardAssetFile of cardAssetFiles) {
     id,
     name: itemData.Localization.Title?.Text ?? itemData.InternalName,
     size: itemData.Size === 'Small' ? 1 : itemData.Size === 'Medium' ? 2 : 3,
+    heroes: itemData.Heroes as Hero[],
     tags: itemData.Tags as Tag[],
     hiddenTags: itemData.HiddenTags as Tag[],
     tooltips: parseTexts(itemData),

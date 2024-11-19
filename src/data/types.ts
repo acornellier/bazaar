@@ -1,5 +1,6 @@
 ﻿import type { IconType } from 'react-icons'
 import type { Tag } from './tags.ts'
+import type { Hero } from './heroes.ts'
 
 export type Tier = 'Bronze' | 'Silver' | 'Gold' | 'Diamond'
 
@@ -94,6 +95,7 @@ export type Item = {
   id: string
   name: string
   size: 1 | 2 | 3
+  heroes: Hero[]
   tags: Tag[]
   hiddenTags: Tag[]
   tooltips: Tooltip[]

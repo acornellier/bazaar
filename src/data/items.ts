@@ -2,4 +2,4 @@
 import type { Item } from './types.ts'
 
 // @ts-ignore
-export const items = itemsJson as Item[]
+export const allItems = itemsJson as Item[]

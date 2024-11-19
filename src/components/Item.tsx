@@ -28,7 +28,7 @@ function ItemComponentNoMemo({ item }: Props) {
         <div
           className="absolute top-0 h-full w-full object-fill bg-repeat-round rounded-md"
           style={{
-            backgroundImage: `url(/images/card-frames/frame_bronze_${item.size}.png)`,
+            backgroundImage: `url(/images/card-frames/frame_${curTier.toLowerCase()}_${item.size}.png)`,
           }}
         />
         <div

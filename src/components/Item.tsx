@@ -63,7 +63,7 @@ function ItemComponentNoMemo({ item }: Props) {
             {item.tags.map((tag) => (
               <div
                 key={tag}
-                className={`px-2 py-0.5 bg-[#2b1c0e] border border-b-0 border-amber-800 font-bold text-sm 
+                className={`px-2 py-0.5 bg-[#1c0d03] border border-b-0 border-amber-800 font-bold text-sm 
                             rounded-t-md text-outline ${colors.tag}`}
               >
                 {tag.toUpperCase()}
@@ -71,8 +71,12 @@ function ItemComponentNoMemo({ item }: Props) {
             ))}
           </div>
           <div
-            className={`w-72 flex flex-col gap-1 bg-[#2b1c0e] rounded-md px-4 p-2 border-2 border-amber-900
+            className={`w-72 flex flex-col gap-1 rounded-md px-4 p-2 border-2 border-amber-900
                       text-amber-100`}
+            style={{
+              backgroundImage:
+                'linear-gradient(to right, rgb(19, 9, 2), rgb(47, 22, 7), rgb(19, 9, 2))',
+            }}
           >
             <div className="text-xl font-serif font-bold text-outline">{item.name}</div>
             <div className="flex gap-1 text-xs font-bold text-black">
@@ -123,9 +127,9 @@ function ItemComponentNoMemo({ item }: Props) {
                   </div>
                 )}
                 {attributes.AmmoMax && (
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-[100%]">
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-[105%]">
                     <div
-                      className={`bg-[#2b1c0e] border border-amber-800 rounded-sm p-1 
+                      className={`bg-[#1c0d03] border border-amber-800 rounded-md p-1 
                                   flex flex-col items-center justify-center ${colors.ammo}`}
                     >
                       <GiHeavyBullets size={18} />

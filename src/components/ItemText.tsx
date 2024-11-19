@@ -1,6 +1,6 @@
 import { type ActionTypeModifier, type Item, type Tier } from '../data/types.ts'
 import { getAttributeData } from '../util/attributes.ts'
-import { getTag, tagColors, tags } from '../data/tags.ts'
+import { allTags, getTag, tagColors } from '../data/tags.ts'
 
 interface Props {
   item: Item
@@ -9,7 +9,7 @@ interface Props {
 }
 
 const specialTextRegex = new RegExp(
-  `(\\[?\{(?:ability|aura)\..*?\}\\]?|${tags.map((tag) => `\\b${tag}\\b`).join('|')})`,
+  `(\\[?\{(?:ability|aura)\..*?\}\\]?|${allTags.map((tag) => `\\b${tag}\\b`).join('|')})`,
   'gi',
 )
 

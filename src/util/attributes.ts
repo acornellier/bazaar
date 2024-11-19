@@ -9,7 +9,7 @@ import type {
 } from '../data/types.ts'
 import { colors } from './colors.ts'
 import { IoShieldHalfOutline, IoStopwatchOutline } from 'react-icons/io5'
-import { FaBoltLightning, FaBurst } from 'react-icons/fa6'
+import { FaBoltLightning, FaBurst, FaRegSnowflake } from 'react-icons/fa6'
 import { ImFire } from 'react-icons/im'
 import { GiDeathSkull, GiHealthNormal, GiHeavyBullets } from 'react-icons/gi'
 import { SlTarget } from 'react-icons/sl'
@@ -83,6 +83,11 @@ const attributeFormattings: { [key in Attribute]?: AttributeFormatting } = {
   DamageAmount: {
     color: colors.damage,
     Icon: FaBurst,
+  },
+  FreezeAmount: {
+    color: colors.freeze,
+    ms: true,
+    Icon: FaRegSnowflake,
   },
   HasteAmount: {
     color: colors.haste,

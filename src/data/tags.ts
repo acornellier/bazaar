@@ -1,30 +1,28 @@
 import { colors } from '../util/colors.ts'
 
-export const tags = [
+export const tags = ['Aquatic', 'Friend', 'Property', 'Tool', 'Vehicle', 'Weapon']
+
+export const hiddenTags = [
   'Ammo',
-  'Aquatic',
   'Burn',
   'Charge',
   'Crit',
   'Cooldown',
   'Damage',
-  'Friend',
   'Freeze',
   'Haste',
   'Heal',
   'Poison',
-  'Property',
   'Shield',
   'Slow',
-  'Tool',
-  'Vehicle',
-  'Weapon',
 ] as const
 
-export type Tag = (typeof tags)[number]
+export const allTags = [...tags, ...hiddenTags]
+
+export type Tag = (typeof allTags)[number]
 
 export function getTag(str: string) {
-  return tags.find((v) => v.toLowerCase() === str.toLowerCase())
+  return allTags.find((v) => v.toLowerCase() === str.toLowerCase())
 }
 
 export const tagColors: Record<Tag, string> = {

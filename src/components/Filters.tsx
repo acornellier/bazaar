@@ -1,10 +1,11 @@
 ﻿import type { Item } from '../data/types.ts'
-import { type Tag, tags } from '../data/tags.ts'
+import { hiddenTags, type Tag, tags } from '../data/tags.ts'
 import { allItems } from '../data/items.ts'
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDebounce } from '../util/hooks/useDebounce.ts'
 import { useSetState } from '../util/hooks/useSetState.ts'
 import { type Hero, heroes } from '../data/heroes.ts'
+import { Checkbox } from './Checkbox.tsx'
 
 interface Props {
   setItems: (items: Item[]) => void
@@ -34,7 +35,7 @@ export function Filters({ setItems }: Props) {
   }, [filteredItems, setItems])
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-4">
       <input
         type="search"
         placeholder={`Search ${filteredItems.length} items...`}
@@ -42,42 +43,27 @@ export function Filters({ setItems }: Props) {
         onChange={(e) => setSearch(e.target.value)}
         className="text-black rounded-sm p-0.5"
       />
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 items-center">
+        <span className="font-bold min-w-20">Heroes</span>
         {heroes.map((hero) => (
-          <div key={hero} className="flex items-center">
-            <input
-              id={`filter-tag--${hero}`}
-              type="checkbox"
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-              checked={selectedHeroes.has(hero)}
-              onChange={() => toggleHero(hero)}
-            />
-            <label
-              htmlFor={`filter-hero-${hero}`}
-              className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-              {hero}
-            </label>
-          </div>
+          <Checkbox
+            key={hero}
+            checked={selectedHeroes.has(hero)}
+            label={hero}
+            toggle={toggleHero}
+          />
         ))}
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 items-center">
+        <span className="font-bold min-w-20">Tags</span>
         {tags.map((tag) => (
-          <div key={tag} className="flex items-center">
-            <input
-              id={`filter-tag--${tag}`}
-              type="checkbox"
-              className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-              checked={selectedTags.has(tag)}
-              onChange={() => toggleTag(tag)}
-            />
-            <label
-              htmlFor={`filter-tag-${tag}`}
-              className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-            >
-              {tag}
-            </label>
-          </div>
+          <Checkbox key={tag} checked={selectedTags.has(tag)} label={tag} toggle={toggleTag} />
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-2 items-center">
+        <span className="font-bold min-w-20">Attributes</span>
+        {hiddenTags.map((tag) => (
+          <Checkbox key={tag} checked={selectedTags.has(tag)} label={tag} toggle={toggleTag} />
         ))}
       </div>
     </div>

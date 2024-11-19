@@ -4,7 +4,7 @@ export const colors = {
   ammo: 'text-orange-400',
   burn: 'text-orange-400',
   crit: 'text-red-400',
-  damage: 'text-red-400',
+  damage: 'text-red-500',
   haste: 'text-teal-400',
   heal: 'text-lime-400',
   freeze: 'text-cyan-400',

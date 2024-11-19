@@ -184,3 +184,21 @@ export function getAttributeData(
 
   return null
 }
+
+export function getTierAttributes(tier: Tier, tiers: TierData[]) {
+  const attributes: { [key in Attribute]?: number } = {}
+
+  let found = false
+  for (const tierData of tiers.toReversed()) {
+    if (!found && tier != tierData.tier) continue
+    found = true
+
+    for (const [attribute, value] of Object.entries(tierData.attributes)) {
+      if (!(attribute in attributes)) {
+        attributes[attribute as Attribute] = value
+      }
+    }
+  }
+
+  return attributes
+}

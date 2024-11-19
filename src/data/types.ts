@@ -11,6 +11,7 @@ export type Attribute =
   | 'CritChance'
   | 'HasteAmount'
   | 'HasteTargets'
+  | 'AmmoMax'
   | 'ReloadAmount'
   | 'ReloadTargets'
   | 'ChargeAmount'

@@ -9,7 +9,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
-  font-family: 'Roboto Slab Variable', serif;
   color: white;
 }
 
@@ -23,4 +22,11 @@
 
 .text-outline {
   @include text-outline(0.5px);
+}
+
+.active-arrow {
+  > path:first-child {
+    fill: #935f28;
+    opacity: 1
+  }
 }

@@ -72,7 +72,7 @@ function SectionText({ item, tier, section }: SectionTextProps) {
   return (
     <span className={`${formatting?.color}`}>
       {formatting?.Icon && <formatting.Icon className="inline-block mr-0.5 mb-1" size={20} />}
-      <span className={`${size} leading-4`}>{formattedValue}</span>
+      <span className={`${size} leading-4 font-serif`}>{formattedValue}</span>
     </span>
   )
 }

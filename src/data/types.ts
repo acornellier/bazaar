@@ -1,4 +1,5 @@
 ﻿import type { IconType } from 'react-icons'
+import type { Tag } from './tags.ts'
 
 export type Tier = 'Bronze' | 'Silver' | 'Gold' | 'Diamond'
 
@@ -15,6 +16,7 @@ export type Attribute =
   | 'ChargeAmount'
   | 'ChargeTargets'
   | 'HealAmount'
+  | 'HealthRegen'
   | 'ShieldApplyAmount'
   | 'JoyApplyAmount'
   | 'SlowAmount'
@@ -91,6 +93,8 @@ export type Item = {
   id: string
   name: string
   size: 1 | 2 | 3
+  tags: Tag[]
+  hiddenTags: Tag[]
   tooltips: Tooltip[]
   abilities: Ability[]
   auras: Ability[]

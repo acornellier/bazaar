@@ -9,10 +9,11 @@ import type {
 } from '../data/types.ts'
 import { colors } from './colors.ts'
 import { IoShieldHalfOutline, IoStopwatchOutline } from 'react-icons/io5'
-import { FaBurst } from 'react-icons/fa6'
+import { FaBoltLightning, FaBurst } from 'react-icons/fa6'
 import { ImFire } from 'react-icons/im'
 import { GiDeathSkull, GiHealthNormal, GiHeavyBullets } from 'react-icons/gi'
 import { SlTarget } from 'react-icons/sl'
+import { FaHeart } from 'react-icons/fa'
 
 export type ActionTypeModifiers = { [key in ActionTypeModifier]?: Attribute }
 
@@ -68,9 +69,9 @@ const attributeFormattings: { [key in Attribute]?: AttributeFormatting } = {
     Icon: ImFire,
   },
   ChargeAmount: {
-    color: colors.damage,
+    color: colors.haste,
     ms: true,
-    Icon: FaBurst,
+    Icon: FaBoltLightning,
   },
   CooldownMax: {
     ms: true,
@@ -91,6 +92,10 @@ const attributeFormattings: { [key in Attribute]?: AttributeFormatting } = {
   HealAmount: {
     color: colors.heal,
     Icon: GiHealthNormal,
+  },
+  HealthRegen: {
+    color: colors.heal,
+    Icon: FaHeart,
   },
   PoisonApplyAmount: {
     color: colors.poison,
@@ -147,7 +152,7 @@ export function getAttributeValue(attribute: Attribute, tier: Tier, tiers: TierD
     found = true
 
     const attributeValue = tierData.attributes[attribute]
-    if (attributeValue) return attributeValue
+    if (attributeValue !== undefined) return attributeValue
   }
 
   return null
@@ -171,7 +176,7 @@ export function getAttributeData(
   const attribute = getAttribute(ability, modifier)
   if (!attribute) return null
 
-  const attributeValue = getAttributeValue(attribute.main ?? attribute.accessor, tier, tiers)
+  const attributeValue = getAttributeValue(attribute.accessor ?? attribute.main, tier, tiers)
   if (attributeValue !== null) {
     const formatting = attributeFormattings[attribute.main]
     return { value: attributeValue, formatting }

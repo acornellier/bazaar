@@ -1,29 +1,33 @@
 import { colors } from '../util/colors.ts'
 
-export const tags = ['Aquatic', 'Friend', 'Property', 'Tool', 'Vehicle', 'Weapon'] as const
-
-export const keywords = [
-  ...tags,
+export const tags = [
   'Ammo',
+  'Aquatic',
   'Burn',
+  'Charge',
   'Crit Chance',
   'Cooldown',
   'Damage',
+  'Friend',
   'Freeze',
   'Haste',
   'Heal',
   'Poison',
+  'Property',
   'Shield',
   'Slow',
+  'Tool',
+  'Vehicle',
+  'Weapon',
 ] as const
 
-export type Keyword = (typeof keywords)[number]
+export type Tag = (typeof tags)[number]
 
-export function getKeyword(str: string) {
-  return keywords.find((v) => v.toLowerCase() === str.toLowerCase())
+export function getTag(str: string) {
+  return tags.find((v) => v.toLowerCase() === str.toLowerCase())
 }
 
-export const keywordColors: Record<Keyword, string> = {
+export const tagColors: Record<Tag, string> = {
   Aquatic: colors.tag,
   Friend: colors.tag,
   Property: colors.tag,
@@ -33,6 +37,7 @@ export const keywordColors: Record<Keyword, string> = {
 
   Ammo: colors.ammo,
   Burn: colors.burn,
+  Charge: colors.haste,
   'Crit Chance': colors.crit,
   Cooldown: colors.haste,
   Damage: colors.damage,

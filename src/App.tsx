@@ -8,10 +8,12 @@ export function App() {
   const debouncedSearch = useDebounce(search, 100)
 
   const filteredItems = useMemo(() => {
+    const finalSearch = debouncedSearch.toLowerCase()
     return items.filter(
       (item) =>
-        item.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        item.tooltips.some(({ text }) => text.toLowerCase().includes(debouncedSearch)),
+        item.name.toLowerCase().includes(finalSearch) ||
+        item.tags.some((tag) => tag.toLowerCase() === finalSearch) ||
+        item.hiddenTags.some((tag) => tag.toLowerCase() === finalSearch),
     )
   }, [items, debouncedSearch])
 

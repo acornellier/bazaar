@@ -1,6 +1,6 @@
 import { type ActionTypeModifier, type Item, type Tier } from '../data/types.ts'
 import { getAttributeData } from '../util/attributes.ts'
-import { getKeyword, keywordColors, keywords } from '../data/keywords.ts'
+import { getTag, tagColors, tags } from '../data/tags.ts'
 
 interface Props {
   item: Item
@@ -9,7 +9,7 @@ interface Props {
 }
 
 const specialTextRegex = new RegExp(
-  `(\{(?:ability|aura)\..*?\}|${keywords.map((keyword) => `\\b${keyword}\\b`).join('|')})`,
+  `(\\[?\{(?:ability|aura)\..*?\}\\]?|${tags.map((tag) => `\\b${tag}\\b`).join('|')})`,
   'gi',
 )
 
@@ -23,10 +23,10 @@ function SectionText({ item, tier, section }: SectionTextProps) {
   if (!section.match(specialTextRegex)) return section
 
   if (!section.startsWith('{')) {
-    const keyword = getKeyword(section)
-    if (!keyword) return section
+    const tag = getTag(section)
+    if (!tag) return section
 
-    return <span className={`${keywordColors[keyword]}`}>{keyword}</span>
+    return <span className={`${tagColors[tag]}`}>{tag}</span>
   }
 
   const abilityMatch = section.match(/\{(ability|aura)\.(\d)\.?(\w+)?(\|%)?\}/)
@@ -60,7 +60,9 @@ function SectionText({ item, tier, section }: SectionTextProps) {
 
   const attributeData = getAttributeData(ability, modifier, tier, item.tiers)
   if (!attributeData) {
-    console.error(`Item "${item.name}" ability ${section} modifier "${modifier}" attribute data`)
+    console.error(
+      `Item "${item.name}" ability ${section} modifier "${modifier}" missing attribute data`,
+    )
     return section
   }
 
@@ -80,11 +82,13 @@ export function ItemText({ item, tooltip, tier }: Props) {
 
   return (
     <span>
-      {sections.map((section, idx) => (
-        <span key={idx} className="font-bold">
-          <SectionText item={item} tooltip={tooltip} tier={tier} section={section} />
-        </span>
-      ))}
+      {sections
+        .filter((section) => !section.startsWith('['))
+        .map((section, idx) => (
+          <span key={idx} className="font-bold">
+            <SectionText item={item} tooltip={tooltip} tier={tier} section={section} />
+          </span>
+        ))}
     </span>
   )
 }

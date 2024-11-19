@@ -5,6 +5,7 @@ import yaml from 'js-yaml'
 import path from 'path'
 import nodeCmd from 'node-cmd'
 import type { Ability, ActionType, Attribute, Item, Tier, Tooltip } from '../src/data/types.ts'
+import type { Tag } from '../src/data/tags.ts'
 
 const dirname = getDirname(import.meta.url)
 const exportDir = `${dirname}/../export`
@@ -68,6 +69,7 @@ interface CardData {
   Size: 'Small' | 'Medium' | 'Large'
   Heroes: string[]
   Tags: string[]
+  HiddenTags: string[]
   Tiers: Record<
     Tier,
     {
@@ -134,15 +136,11 @@ let usedIds = new Set()
 
 fs.mkdirSync(`${dirname}/../public/images/cards`, { recursive: true })
 
-function parseTexts(itemData: CardData) {
-  let usedKeys = new Set<string>()
-  let texts: Tooltip[] = []
-  for (const { TooltipType, Content } of itemData.Localization.Tooltips) {
-    if (usedKeys.has(Content.Key)) continue
-    usedKeys.add(Content.Key)
-    texts.push({ text: Content.Text, type: TooltipType })
-  }
-  return texts
+function parseTexts(itemData: CardData): Tooltip[] {
+  return itemData.Localization.Tooltips.map(({ Content, TooltipType }) => ({
+    text: Content.Text,
+    type: TooltipType,
+  }))
 }
 
 function parseAbilities(abilities: Record<string, CardDataAbility>): Ability[] {
@@ -232,6 +230,8 @@ for (const cardAssetFile of cardAssetFiles) {
     id,
     name: itemData.Localization.Title?.Text ?? itemData.InternalName,
     size: itemData.Size === 'Small' ? 1 : itemData.Size === 'Medium' ? 2 : 3,
+    tags: itemData.Tags as Tag[],
+    hiddenTags: itemData.HiddenTags as Tag[],
     tooltips: parseTexts(itemData),
     abilities: parseAbilities(itemData.Abilities),
     auras: parseAbilities(itemData.Auras),

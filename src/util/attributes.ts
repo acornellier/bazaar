@@ -72,6 +72,9 @@ const attributeFormattings: { [key in Attribute]?: AttributeFormatting } = {
     ms: true,
     Icon: FaBurst,
   },
+  CooldownMax: {
+    ms: true,
+  },
   CritChance: {
     color: colors.crit,
     Icon: SlTarget,
@@ -137,6 +140,19 @@ export function getAttribute(
   return { main: attribute }
 }
 
+export function getAttributeValue(attribute: Attribute, tier: Tier, tiers: TierData[]) {
+  let found = false
+  for (const tierData of tiers.toReversed()) {
+    if (!found && tier != tierData.tier) continue
+    found = true
+
+    const attributeValue = tierData.attributes[attribute]
+    if (attributeValue) return attributeValue
+  }
+
+  return null
+}
+
 export function getAttributeData(
   ability: Ability,
   modifier: ActionTypeModifier,
@@ -155,16 +171,10 @@ export function getAttributeData(
   const attribute = getAttribute(ability, modifier)
   if (!attribute) return null
 
-  let found = false
-  for (const tierData of tiers.toReversed()) {
-    if (!found && tier != tierData.tier) continue
-    found = true
-
-    const attributeValue = tierData.attributes[attribute.accessor ?? attribute.main]
-    if (attributeValue !== undefined) {
-      const formatting = attributeFormattings[attribute.main]
-      return { value: attributeValue, formatting }
-    }
+  const attributeValue = getAttributeValue(attribute.main ?? attribute.accessor, tier, tiers)
+  if (attributeValue !== null) {
+    const formatting = attributeFormattings[attribute.main]
+    return { value: attributeValue, formatting }
   }
 
   return null

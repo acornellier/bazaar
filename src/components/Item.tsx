@@ -4,6 +4,7 @@ import { getTierBg } from '../util/colors.ts'
 import { PiArrowFatRightDuotone } from 'react-icons/pi'
 import { ItemText } from './ItemText.tsx'
 import { isDev } from '../util/isDev.ts'
+import { getAttributeValue } from '../util/attributes.ts'
 
 interface Props {
   item: Item
@@ -15,8 +16,15 @@ function ItemComponentNoMemo({ item }: Props) {
   const curTierData = item.tiers.find((tierData) => tierData.tier === curTier)
 
   const tooltips = item.tooltips.filter((_, idx) => curTierData?.TooltipIds.includes(idx))
-  const passives = tooltips.filter(({ type }) => type === 'Passive')
-  const actives = tooltips.filter(({ type }) => type === 'Active')
+  const passives = tooltips.filter(({ type }) => type === 'Passive').map(({ text }) => text)
+  const actives = tooltips.filter(({ type }) => type === 'Active').map(({ text }) => text)
+
+  const multicastValue = getAttributeValue('Multicast', curTier, item.tiers)
+  if (multicastValue !== null && multicastValue > 1) {
+    actives.push(`Multicast: ${multicastValue}`)
+  }
+
+  const cooldown = getAttributeValue('CooldownMax', curTier, item.tiers)
 
   return (
     <div className="h-48 p-1 flex flex-col text-outline" style={{ aspectRatio: `${item.size}/2` }}>
@@ -38,10 +46,11 @@ function ItemComponentNoMemo({ item }: Props) {
           }}
         />
         <div
-          className={`absolute w-72 opacity-0 group-hover:opacity-100 transition-opacity duration-300
+          className={`absolute w-72 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto
+                      transition-opacity duration-300
                       flex flex-col gap-1 bg-[#2b1c0e] rounded-md px-4 p-2 border border-gray-400
                       text-amber-100
-                      ${selected ? 'opacity-100' : ''}`}
+                      ${selected ? 'opacity-100 pointer-events-auto' : ''}`}
         >
           <div className="text-xl">{item.name}</div>
           <div className="flex gap-1 text-xs">
@@ -59,16 +68,36 @@ function ItemComponentNoMemo({ item }: Props) {
             })}
           </div>
           <div className="flex flex-col gap-1 text-sm">
-            {actives.map(({ text }, idx) => (
-              <div key={idx} className="flex gap-1">
-                <div className="pt-[3px]">
-                  <PiArrowFatRightDuotone fill="#69553a" size={16} />
-                </div>
-                <ItemText item={item} tooltip={text} tier={curTier} />
+            <div className="relative">
+              <div className="ml-4">
+                {actives.map((text, idx) => (
+                  <div key={idx} className="flex gap-1">
+                    <div className="pt-[3px]">
+                      <PiArrowFatRightDuotone fill="#69553a" color="blue" size={16} />
+                    </div>
+                    <ItemText item={item} tooltip={text} tier={curTier} />
+                  </div>
+                ))}
               </div>
-            ))}
+              {cooldown && (
+                <div className="absolute top-1/2 -translate-y-1/2 -translate-x-[75%]">
+                  <div
+                    className="flex items-center justify-center w-16 h-16 bg-contain bg-no-repeat"
+                    style={{
+                      backgroundImage: `url(/images/cooldown_clock.png)`,
+                    }}
+                  >
+                    <div className="text-center leading-3 text-2xl font-extrabold text-white -translate-x-[3px] translate-y-[1px]">
+                      {(cooldown / 1000).toFixed(1)}
+                      <br />
+                      <span className="text-[10px] text-[#e1a35a] font-black">SEC</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
             {passives.length > 0 && actives.length > 0 && <div className="bg-gray-500 h-0.5" />}
-            {passives.map(({ text }, idx) => (
+            {passives.map((text, idx) => (
               <div key={idx}>
                 <ItemText item={item} tooltip={text} tier={curTier} />
               </div>

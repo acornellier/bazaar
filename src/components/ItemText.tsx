@@ -9,7 +9,7 @@ interface Props {
 }
 
 const specialTextRegex = new RegExp(
-  `(\{(?:ability|aura)\..*\}|${keywords.map((keyword) => `\\b${keyword}\\b`).join('|')})`,
+  `(\{(?:ability|aura)\..*?\}|${keywords.map((keyword) => `\\b${keyword}\\b`).join('|')})`,
   'gi',
 )
 

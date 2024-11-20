@@ -24,7 +24,7 @@ export function Filters({ setItems }: Props) {
       const allTags = new Set([...item.tags, ...item.hiddenTags])
       return (
         item.name.toLowerCase().includes(finalSearch) &&
-        selectedHeroes.isSubsetOf(new Set(item.heroes)) &&
+        (selectedHeroes.size === 0 || selectedHeroes.intersection(new Set(item.heroes)).size) &&
         selectedTags.isSubsetOf(allTags)
       )
     })

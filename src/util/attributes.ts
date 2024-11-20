@@ -3,6 +3,7 @@ import type {
   ActionType,
   ActionTypeModifier,
   Attribute,
+  Attributes,
   IconComponent,
   Tier,
   TierData,
@@ -191,7 +192,7 @@ export function getAttributeData(
 }
 
 export function getTierAttributes(tier: Tier, tiers: TierData[]) {
-  const attributes: { [key in Attribute]?: number } = {}
+  const attributes: Attributes = {}
 
   let found = false
   for (const tierData of tiers.toReversed()) {

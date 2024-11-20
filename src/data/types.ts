@@ -35,6 +35,8 @@ export type Attribute =
   | 'Custom_3'
   | 'Custom_4'
 
+export type Attributes = { [key in Attribute]?: number }
+
 export type ActionType =
   | 'TActionPlayerDamage'
   | 'TActionCardHaste'

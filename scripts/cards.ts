@@ -4,7 +4,16 @@ import { glob } from 'glob'
 import yaml from 'js-yaml'
 import path from 'path'
 import nodeCmd from 'node-cmd'
-import type { Ability, ActionType, Attribute, Item, Tier, Tooltip } from '../src/data/types.ts'
+import type {
+  Ability,
+  ActionType,
+  Attribute,
+  Card,
+  Item,
+  Skill,
+  Tier,
+  Tooltip,
+} from '../src/data/types.ts'
 import type { Tag } from '../src/data/tags.ts'
 import type { Hero } from '../src/data/heroes.ts'
 
@@ -96,6 +105,9 @@ const cardMatMetaFiles = await glob([
 ])
 const textureFiles = await glob([`${exportDir}/**/CF_*.png`, `${exportDir}/**/PNG_*.png`])
 const allPngFiles = await glob([`${exportDir}/**/*.png`])
+const skillImageFiles = await glob([
+  `${exportDir}/Assets/TheBazaar/Art/UI/Skills/**/Icon_Skill_*.png`,
+])
 
 function parseCardDatas(file: string) {
   const cardDatasFileContents = fs.readFileSync(file).toString()
@@ -107,12 +119,7 @@ function parseCardDatas(file: string) {
 const cardDatas = [
   ...parseCardDatas(`${exportDir}/v2_Cards_Derived.json`),
   ...parseCardDatas(`${exportDir}/v2_Cards.json`),
-]
-
-let found = 0
-let potential = 0
-
-const itemDatas = cardDatas.filter((card) => card.Type === 'Item')
+].filter((card) => card.Type === 'Item' || card.Type === 'Skill')
 
 function loadYamlFile<T>(file: string) {
   const cardAssetFileContents = fs
@@ -124,16 +131,13 @@ function loadYamlFile<T>(file: string) {
   return yaml.load(cardAssetFileContents) as T
 }
 
-let matGuidToMatName: Record<string, string> = {}
+const matGuidToMatName: Record<string, string> = {}
 
 for (const matMetaFile of cardMatMetaFiles) {
   const matMeta = loadYamlFile<MatMeta>(matMetaFile)
   const matAsset = loadYamlFile<MatAsset>(matMetaFile.replace('.meta', '')).Material
   matGuidToMatName[matMeta.guid] = matAsset.m_Name
 }
-
-let items: Item[] = []
-let usedIds = new Set()
 
 fs.mkdirSync(`${dirname}/../public/images/cards`, { recursive: true })
 
@@ -171,6 +175,38 @@ function parseAbilities(abilities: Record<string, CardDataAbility>): Ability[] {
   }))
 }
 
+function parseCard(cardData: CardData, id: string): Card | null {
+  if (
+    cardData.Localization.Tooltips.length === 0 ||
+    cardData.Localization.Tooltips.some((tooltip) => !tooltip.Content)
+  ) {
+    // console.error(`Tooltips missing for ${cardData.InternalName}`)
+    return null
+  }
+
+  return {
+    id,
+    name: cardData.Localization.Title?.Text ?? cardData.InternalName,
+    size: cardData.Size === 'Small' ? 1 : cardData.Size === 'Medium' ? 2 : 3,
+    heroes: cardData.Heroes as Hero[],
+    tags: cardData.Tags as Tag[],
+    hiddenTags: cardData.HiddenTags as Tag[],
+    tooltips: parseTexts(cardData),
+    abilities: parseAbilities(cardData.Abilities),
+    auras: parseAbilities(cardData.Auras),
+    tiers: Object.entries(cardData.Tiers).map(([tier, tierData]) => ({
+      tier: tier as Tier,
+      attributes: tierData.Attributes,
+      TooltipIds: tierData.TooltipIds.map((id) => Number(id)),
+    })),
+  }
+}
+
+let potential = 0
+
+const items: Item[] = []
+const usedIds = new Set()
+
 for (const cardAssetFile of cardAssetFiles) {
   const cardAsset = loadYamlFile<CardAsset>(cardAssetFile).MonoBehaviour
 
@@ -183,20 +219,23 @@ for (const cardAssetFile of cardAssetFiles) {
 
   potential += 1
 
-  const itemData = itemDatas.find(
+  const cardData = cardDatas.find(
     (data) => data.Id === id || data.InternalName === internalName || data.ArtKey === id,
   )
-  if (!itemData) {
+  if (!cardData) {
     console.error(
       `Item data not found for ${path.basename(cardAssetFile)} with id ${id} or name ${internalName}`,
     )
     continue
   }
 
+  const card = parseCard(cardData, id)
+  if (card === null) continue
+
   const matName = matGuidToMatName[cardAsset.cardMaterial.guid]
   const imageFileName = new RegExp(`${matName}(_D)?.png`.toLowerCase())
 
-  const backupImageName = itemData.InternalName.replaceAll(' ', '').toLowerCase()
+  const backupImageName = cardData.InternalName.replaceAll(' ', '').toLowerCase()
   const backupFileName1 = new RegExp(`\\\\${backupImageName}.*.png`, 'i')
   const backupFileName2 = new RegExp(`${backupImageName}.*.png`, 'i')
 
@@ -209,43 +248,60 @@ for (const cardAssetFile of cardAssetFiles) {
 
   if (!imageFile) {
     console.error(
-      `Image data not found for ${itemData.InternalName}, searched for "${imageFileName}" and "${backupFileName1}`,
+      `Image data not found for ${cardData.InternalName}, searched for "${imageFileName}" and "${backupFileName1}`,
     )
     continue
   }
 
   const outFile = `${dirname}/../public/images/cards/${id}.jpg`
   if (!fs.existsSync(outFile)) {
-    console.log(`Copying image ${found} ${imageFile} to ${outFile}`)
+    console.log(`Copying image ${items.length} ${imageFile} to ${outFile}`)
     fs.copyFileSync(imageFile, outFile)
     const command = `"${magickExe}" "${outFile}" -alpha off -background white -flatten -quality 60 -resize 512x512 "${outFile}"`
     nodeCmd.runSync(command)
   }
 
-  if (itemData.Localization.Tooltips.some((tooltip) => !tooltip.Content)) {
-    console.error(`Tooltips missing for ${itemData.InternalName}`)
-    continue
-  }
-
-  items.push({
-    id,
-    name: itemData.Localization.Title?.Text ?? itemData.InternalName,
-    size: itemData.Size === 'Small' ? 1 : itemData.Size === 'Medium' ? 2 : 3,
-    heroes: itemData.Heroes as Hero[],
-    tags: itemData.Tags as Tag[],
-    hiddenTags: itemData.HiddenTags as Tag[],
-    tooltips: parseTexts(itemData),
-    abilities: parseAbilities(itemData.Abilities),
-    auras: parseAbilities(itemData.Auras),
-    tiers: Object.entries(itemData.Tiers).map(([tier, tierData]) => ({
-      tier: tier as Tier,
-      attributes: tierData.Attributes,
-      TooltipIds: tierData.TooltipIds.map((id) => Number(id)),
-    })),
-  })
-
-  found += 1
+  items.push(card)
 }
 
 fs.writeFileSync(`${dirname}/../src/data/items.json`, JSON.stringify(items))
-console.log(`Parsed ${found}/${potential} cards`)
+console.log(`Parsed ${items.length}/${potential} items`)
+
+potential = 0
+
+const skills: Skill[] = []
+for (const cardData of cardDatas) {
+  if (cardData.Type !== 'Skill') continue
+
+  const id = cardData.Id
+  if (!id) continue
+  if (usedIds.has(id)) continue
+  usedIds.add(id)
+
+  potential += 1
+
+  if (cardData.ArtKey.includes('Placeholder')) continue
+
+  const card = parseCard(cardData, id)
+  if (card === null) continue
+
+  const imageFile = skillImageFiles.find((file) => file.includes(cardData.ArtKey))
+
+  if (!imageFile) {
+    console.error(`Image data not found for ${cardData.InternalName}`)
+    continue
+  }
+
+  const outFile = `${dirname}/../public/images/cards/${id}.jpg`
+  if (!fs.existsSync(outFile)) {
+    console.log(`Copying image ${skills.length} ${imageFile} to ${outFile}`)
+    fs.copyFileSync(imageFile, outFile)
+    const command = `"${magickExe}" "${outFile}" -quality 60 -resize 128x128 "${outFile}"`
+    nodeCmd.runSync(command)
+  }
+
+  skills.push(card)
+}
+
+fs.writeFileSync(`${dirname}/../src/data/skills.json`, JSON.stringify(skills))
+console.log(`Parsed ${skills.length}/${potential} skills`)

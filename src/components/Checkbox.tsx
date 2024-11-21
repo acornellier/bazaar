@@ -23,7 +23,7 @@ export function Checkbox<T extends string>({ checked, label, toggle }: Props<T>)
           <label className="flex items-center cursor-pointer relative" htmlFor={id}>
             <input
               type="checkbox"
-              className="peer h-5 w-5 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-slate-800 checked:border-slate-800"
+              className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-slate-800 checked:border-slate-800"
               id={id}
               checked={checked}
               onChange={onChange}
@@ -45,7 +45,7 @@ export function Checkbox<T extends string>({ checked, label, toggle }: Props<T>)
               </svg>
             </span>
           </label>
-          <label className="cursor-pointer ml-2 text-white text-sm" htmlFor={id}>
+          <label className="cursor-pointer ml-2 text-white text-sm select-none" htmlFor={id}>
             {label}
           </label>
         </div>

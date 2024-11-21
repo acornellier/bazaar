@@ -1,6 +1,6 @@
 import { colors } from '../util/colors.ts'
 
-export const tags = ['Aquatic', 'Friend', 'Property', 'Tool', 'Vehicle', 'Weapon']
+export const tags = ['Aquatic', 'Food', 'Friend', 'Potion', 'Property', 'Tool', 'Vehicle', 'Weapon']
 
 export const hiddenTags = [
   'Ammo',

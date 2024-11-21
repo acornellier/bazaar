@@ -93,7 +93,7 @@ export type Tooltip = {
   type: 'Active' | 'Passive'
 }
 
-export type Item = {
+export type Card = {
   id: string
   name: string
   size: 1 | 2 | 3
@@ -105,5 +105,10 @@ export type Item = {
   auras: Ability[]
   tiers: TierData[]
 }
+
+export type CardType = 'item' | 'skill'
+
+export type Item = Card
+export type Skill = Card
 
 export type IconComponent = IconType

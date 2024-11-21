@@ -2,7 +2,7 @@ import { colors, getTierBg } from '../util/colors.ts'
 import { PiArrowFatRightDuotone } from 'react-icons/pi'
 import { ItemText } from './ItemText.tsx'
 import { GiHeavyBullets } from 'react-icons/gi'
-import type { Attributes, Item, Tier } from '../data/types.ts'
+import type { Attributes, CardType, Item, Tier } from '../data/types.ts'
 
 interface Props {
   item: Item
@@ -10,6 +10,7 @@ interface Props {
   attributes: Attributes
   curTier: Tier
   setCurTier: (tier: Tier) => void
+  type: CardType
 }
 
 export function ItemTooltip({ item, selected, attributes, curTier, setCurTier }: Props) {
@@ -26,7 +27,7 @@ export function ItemTooltip({ item, selected, attributes, curTier, setCurTier }:
   return (
     <div
       className={`absolute opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto
-                  transition-opacity duration-300
+                  transition-opacity duration-300 z-50
                   ${selected ? 'opacity-100 pointer-events-auto' : ''}`}
     >
       <div className="flex ml-1">

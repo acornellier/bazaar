@@ -1,6 +1,5 @@
-﻿import type { Item } from '../data/types.ts'
+﻿import type { Card, CardType, Skill } from '../data/types.ts'
 import { hiddenTags, type Tag, tags } from '../data/tags.ts'
-import { allItems } from '../data/items.ts'
 import { useEffect, useMemo, useState } from 'react'
 import { useDebounce } from '../util/hooks/useDebounce.ts'
 import { useSetState } from '../util/hooks/useSetState.ts'
@@ -8,10 +7,12 @@ import { type Hero, heroes } from '../data/heroes.ts'
 import { Checkbox } from './Checkbox.tsx'
 
 interface Props {
-  setItems: (items: Item[]) => void
+  setCards: (items: Card[]) => void
+  allCards: Skill[]
+  type: CardType
 }
 
-export function Filters({ setItems }: Props) {
+export function Filters({ setCards, allCards, type }: Props) {
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 100)
 
@@ -20,19 +21,19 @@ export function Filters({ setItems }: Props) {
 
   const filteredItems = useMemo(() => {
     const finalSearch = debouncedSearch.toLowerCase()
-    return allItems.filter((item) => {
-      const allTags = new Set([...item.tags, ...item.hiddenTags])
+    return allCards.filter((card) => {
+      const allTags = new Set([...card.tags, ...card.hiddenTags])
       return (
-        item.name.toLowerCase().includes(finalSearch) &&
-        (selectedHeroes.size === 0 || selectedHeroes.intersection(new Set(item.heroes)).size) &&
+        card.name.toLowerCase().includes(finalSearch) &&
+        (selectedHeroes.size === 0 || selectedHeroes.intersection(new Set(card.heroes)).size) &&
         selectedTags.isSubsetOf(allTags)
       )
     })
-  }, [debouncedSearch, selectedHeroes, selectedTags])
+  }, [allCards, debouncedSearch, selectedHeroes, selectedTags])
 
   useEffect(() => {
-    setItems(filteredItems)
-  }, [filteredItems, setItems])
+    setCards(filteredItems)
+  }, [filteredItems, setCards])
 
   return (
     <div className="flex flex-col gap-4">
@@ -54,12 +55,14 @@ export function Filters({ setItems }: Props) {
           />
         ))}
       </div>
-      <div className="flex flex-wrap gap-2 items-center">
-        <span className="font-bold min-w-20">Tags</span>
-        {tags.map((tag) => (
-          <Checkbox key={tag} checked={selectedTags.has(tag)} label={tag} toggle={toggleTag} />
-        ))}
-      </div>
+      {type === 'item' && (
+        <div className="flex flex-wrap gap-2 items-center">
+          <span className="font-bold min-w-20">Tags</span>
+          {tags.map((tag) => (
+            <Checkbox key={tag} checked={selectedTags.has(tag)} label={tag} toggle={toggleTag} />
+          ))}
+        </div>
+      )}
       <div className="flex flex-wrap gap-2 items-center">
         <span className="font-bold min-w-20">Attributes</span>
         {hiddenTags.map((tag) => (

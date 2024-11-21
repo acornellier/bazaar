@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import 'fancy.scss';
+
 :root {
   background-color: #242424;
   font-synthesis: none;

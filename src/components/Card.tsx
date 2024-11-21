@@ -2,7 +2,7 @@ import { memo, useState } from 'react'
 import type { CardType, Item } from '../data/types.ts'
 import { isDev } from '../util/isDev.ts'
 import { getTierAttributes } from '../util/attributes.ts'
-import { ItemTooltip } from './ItemTooltip.tsx'
+import { CardTooltip } from './CardTooltip.tsx'
 
 interface Props {
   item: Item
@@ -11,7 +11,7 @@ interface Props {
   type: CardType
 }
 
-function ItemComponentNoMemo({ item, hovered, setHoveredItemId, type }: Props) {
+function CardComponentNoMemo({ item, hovered, setHoveredItemId, type }: Props) {
   const [selected, setSelected] = useState(false)
   const [curTier, setCurTier] = useState(item.tiers[0]!.tier)
 
@@ -66,7 +66,7 @@ function ItemComponentNoMemo({ item, hovered, setHoveredItemId, type }: Props) {
           </div>
         </div>
         {(hovered || selected) && (
-          <ItemTooltip
+          <CardTooltip
             item={item}
             selected={selected}
             attributes={attributes}
@@ -80,4 +80,4 @@ function ItemComponentNoMemo({ item, hovered, setHoveredItemId, type }: Props) {
   )
 }
 
-export const ItemComponent = memo(ItemComponentNoMemo)
+export const CardComponent = memo(CardComponentNoMemo)

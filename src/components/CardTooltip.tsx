@@ -1,6 +1,6 @@
 import { colors, getTierBg } from '../util/colors.ts'
 import { PiArrowFatRightDuotone } from 'react-icons/pi'
-import { ItemText } from './ItemText.tsx'
+import { CardText } from './CardText.tsx'
 import { GiHeavyBullets } from 'react-icons/gi'
 import type { Attributes, CardType, Item, Tier } from '../data/types.ts'
 
@@ -13,7 +13,7 @@ interface Props {
   type: CardType
 }
 
-export function ItemTooltip({ item, selected, attributes, curTier, setCurTier }: Props) {
+export function CardTooltip({ item, selected, attributes, curTier, setCurTier, type }: Props) {
   const curTierData = item.tiers.find((tierData) => tierData.tier === curTier)
 
   const tooltips = item.tooltips.filter((_, idx) => curTierData?.TooltipIds.includes(idx))
@@ -30,17 +30,19 @@ export function ItemTooltip({ item, selected, attributes, curTier, setCurTier }:
                   transition-opacity duration-300 z-50
                   ${selected ? 'opacity-100 pointer-events-auto' : ''}`}
     >
-      <div className="flex ml-1">
-        {item.tags.map((tag) => (
-          <div
-            key={tag}
-            className={`px-2 py-0.5 bg-[#1c0d03] border border-b-0 border-amber-800 font-bold text-sm 
+      {type === 'item' && (
+        <div className="flex ml-1">
+          {item.tags.map((tag) => (
+            <div
+              key={tag}
+              className={`px-2 py-0.5 bg-[#1c0d03] border border-b-0 border-amber-800 font-bold text-sm 
                         rounded-t-md text-outline ${colors.tag}`}
-          >
-            {tag.toUpperCase()}
-          </div>
-        ))}
-      </div>
+            >
+              {tag.toUpperCase()}
+            </div>
+          ))}
+        </div>
+      )}
       <div
         className={`w-72 flex flex-col gap-1 rounded-md px-4 p-2 border-2 border-amber-900
                   text-amber-100`}
@@ -74,7 +76,7 @@ export function ItemTooltip({ item, selected, attributes, curTier, setCurTier }:
                   <div className="pt-[3px]">
                     <PiArrowFatRightDuotone fill="black" className="active-arrow" size={16} />
                   </div>
-                  <ItemText item={item} tooltip={text} tier={curTier} />
+                  <CardText item={item} tooltip={text} tier={curTier} />
                 </div>
               ))}
             </div>
@@ -115,7 +117,7 @@ export function ItemTooltip({ item, selected, attributes, curTier, setCurTier }:
           <div className="text-sm text-outline">
             {passives.map((text, idx) => (
               <div key={idx}>
-                <ItemText item={item} tooltip={text} tier={curTier} />
+                <CardText item={item} tooltip={text} tier={curTier} />
               </div>
             ))}
           </div>

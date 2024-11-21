@@ -1,38 +1,69 @@
 import { allItems } from './data/items.ts'
 import { Filters } from './components/Filters.tsx'
 import { useState } from 'react'
-import { ItemComponent } from './components/Item.tsx'
+import { CardComponent } from './components/Card.tsx'
 import { allSkills } from './data/skills.ts'
+import type { CardType } from './data/types.ts'
+import { Button } from './components/Button.tsx'
 
-export function App() {
-  const [items, setItems] = useState(allItems)
-  const [hoveredItemId, setHoveredItemId] = useState<string | null>(null)
+function SkillList() {
+  const [skills, setSkills] = useState(allSkills)
+  const [hoveredId, setHoveredId] = useState<string | null>(null)
 
   return (
-    <div className="flex flex-col p-16">
-      <Filters setItems={setItems} />
-      <div className="flex gap-2 flex-wrap">
-        {allSkills.map((skill) => (
-          <ItemComponent
+    <div className="flex flex-col gap-2">
+      <Filters allCards={allSkills} setCards={setSkills} type="skill" />
+      <div className="flex gap-1 flex-wrap">
+        {skills.map((skill) => (
+          <CardComponent
             key={skill.id}
             item={skill}
-            hovered={hoveredItemId === skill.id}
-            setHoveredItemId={setHoveredItemId}
+            hovered={hoveredId === skill.id}
+            setHoveredItemId={setHoveredId}
             type="skill"
           />
         ))}
       </div>
+    </div>
+  )
+}
+
+function ItemList() {
+  const [items, setItems] = useState(allItems)
+  const [hoveredId, setHoveredId] = useState<string | null>(null)
+
+  return (
+    <div className="flex flex-col gap-2">
+      <Filters allCards={allItems} setCards={setItems} type="item" />
       <div className="flex gap-3 flex-wrap">
         {items.map((item) => (
-          <ItemComponent
+          <CardComponent
             key={item.id}
             item={item}
-            hovered={hoveredItemId === item.id}
-            setHoveredItemId={setHoveredItemId}
+            hovered={hoveredId === item.id}
+            setHoveredItemId={setHoveredId}
             type="item"
           />
         ))}
       </div>
+    </div>
+  )
+}
+
+export function App() {
+  const [page, setPage] = useState<CardType>('item')
+
+  return (
+    <div className="p-16 flex flex-col gap-2 mb-64">
+      <div className="flex gap-2">
+        <Button onClick={() => setPage('item')} active={page === 'item'}>
+          Items
+        </Button>
+        <Button onClick={() => setPage('skill')} active={page === 'skill'}>
+          Skills
+        </Button>
+      </div>
+      {page === 'item' ? <ItemList /> : <SkillList />}
     </div>
   )
 }

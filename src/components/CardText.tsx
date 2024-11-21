@@ -77,7 +77,7 @@ function SectionText({ item, tier, section }: SectionTextProps) {
   )
 }
 
-export function ItemText({ item, tooltip, tier }: Props) {
+export function CardText({ item, tooltip, tier }: Props) {
   const sections = tooltip.split(specialTextRegex).filter(Boolean)
 
   return (

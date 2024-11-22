@@ -11,10 +11,10 @@ interface Props {
   type: CardType
 }
 
-export function Filters({ setCards, allCards, type }: Props) {
+export function CardFilters({ setCards, allCards, type }: Props) {
   const [search, setSearch] = useState('')
 
-  const [selectedHeroes, toggleHero] = useSetState<Hero>(['Vanessa'])
+  const [selectedHeroes, toggleHero] = useSetState<Hero>()
   const [selectedTags, toggleTag] = useSetState<Tag>()
 
   const filteredItems = useMemo(() => {

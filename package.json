@@ -7,7 +7,8 @@
     "dev": "vite --port 8888",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "p": "tsx ./scripts/parse.ts"
   },
   "dependencies": {
     "@types/node": "22.9.1",
@@ -21,6 +22,7 @@
     "tsx": "4.19.2"
   },
   "devDependencies": {
+    "@total-typescript/ts-reset": "0.6.1",
     "@types/js-yaml": "4.0.9",
     "@types/node-cmd": "5.0.0",
     "@types/react": "18.3.12",

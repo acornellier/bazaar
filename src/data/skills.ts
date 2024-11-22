@@ -1,5 +1,6 @@
 ﻿import skillsJson from './skills.json'
 import { type Skill, tiers } from './types.ts'
+import { mapBy } from '../util/nodash.ts'
 
 // @ts-ignore
 export const allSkills = (skillsJson as Skill[]).sort((a, b) => {
@@ -11,3 +12,5 @@ export const allSkills = (skillsJson as Skill[]).sort((a, b) => {
 
   return a.name.localeCompare(b.name)
 })
+
+export const skillsById = mapBy<string, Skill>(allSkills, 'id')

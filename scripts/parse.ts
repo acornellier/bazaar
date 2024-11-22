@@ -10,6 +10,7 @@ import type {
   Attribute,
   Card,
   Item,
+  Monster,
   Skill,
   Tier,
   Tooltip,
@@ -71,10 +72,10 @@ interface CardData {
   Type:
     | 'Item'
     | 'Skill'
+    | 'CombatEncounter'
     | 'PedestalEncounter'
     | 'EventEncounter'
     | 'EncounterStep'
-    | 'CombatEncounter'
   InternalName: string
   Size: 'Small' | 'Medium' | 'Large'
   Heroes: string[]
@@ -98,20 +99,44 @@ interface CardData {
   }
 }
 
+interface MonsterData {
+  Id: string
+  InternalName: string
+  Player: {
+    Attributes: {
+      Prestige: number
+      HealthMax: number
+      Level: number
+    }
+    Hand: {
+      Items: Array<{
+        TemplateId: string
+      }>
+    }
+    Skills: Array<{
+      TemplateId: string
+    }>
+  }
+}
+
 const cardAssetFiles = await glob(`${exportDir}/Assets/TheBazaar/Art/Heroes/**/*_CardData.asset`)
 const cardMatMetaFiles = await glob([
   `${exportDir}/**/CF_*.mat.meta`,
   `${exportDir}/**/PNG_*.mat.meta`,
 ])
 const textureFiles = await glob([`${exportDir}/**/CF_*.png`, `${exportDir}/**/PNG_*.png`])
-const allPngFiles = await glob([`${exportDir}/**/*.png`])
 const skillImageFiles = await glob([
   `${exportDir}/Assets/TheBazaar/Art/UI/Skills/**/Icon_Skill_*.png`,
 ])
+const allPngFiles = await glob([`${exportDir}/**/*.png`])
+
+function parseDataFile<T>(file: string) {
+  const cardDatasFileContents = fs.readFileSync(file).toString()
+  return Object.values(JSON.parse(cardDatasFileContents) as Record<string, T>)
+}
 
 function parseCardDatas(file: string) {
-  const cardDatasFileContents = fs.readFileSync(file).toString()
-  return Object.values(JSON.parse(cardDatasFileContents) as Record<string, CardData>).filter(
+  return parseDataFile<CardData>(file).filter(
     (card) => !card.InternalName.toLowerCase().includes('debug'),
   )
 }
@@ -120,6 +145,8 @@ const cardDatas = [
   ...parseCardDatas(`${exportDir}/v2_Cards_Derived.json`),
   ...parseCardDatas(`${exportDir}/v2_Cards.json`),
 ].filter((card) => card.Type === 'Item' || card.Type === 'Skill')
+
+const monsterDatas = parseDataFile<MonsterData>(`${exportDir}/v2_Monsters.json`)
 
 function loadYamlFile<T>(file: string) {
   const cardAssetFileContents = fs
@@ -202,7 +229,7 @@ function parseCard(cardData: CardData, id: string): Card | null {
   }
 }
 
-let potential = 0
+let potentialItems = 0
 
 const items: Item[] = []
 const usedIds = new Set()
@@ -217,7 +244,7 @@ for (const cardAssetFile of cardAssetFiles) {
 
   const internalName = cardAsset['<Name>k__BackingField']
 
-  potential += 1
+  potentialItems += 1
 
   const cardData = cardDatas.find(
     (data) => data.Id === id || data.InternalName === internalName || data.ArtKey === id,
@@ -248,7 +275,7 @@ for (const cardAssetFile of cardAssetFiles) {
 
   if (!imageFile) {
     console.error(
-      `Image data not found for ${cardData.InternalName}, searched for "${imageFileName}" and "${backupFileName1}`,
+      `Image data not found for item ${cardData.InternalName}, searched for "${imageFileName}" and "${backupFileName1}`,
     )
     continue
   }
@@ -264,10 +291,7 @@ for (const cardAssetFile of cardAssetFiles) {
   items.push(card)
 }
 
-fs.writeFileSync(`${dirname}/../src/data/items.json`, JSON.stringify(items))
-console.log(`Parsed ${items.length}/${potential} items`)
-
-potential = 0
+let potentialSkills = 0
 
 const skills: Skill[] = []
 for (const cardData of cardDatas) {
@@ -278,7 +302,7 @@ for (const cardData of cardDatas) {
   if (usedIds.has(id)) continue
   usedIds.add(id)
 
-  potential += 1
+  potentialSkills += 1
 
   if (cardData.ArtKey.includes('Placeholder')) continue
 
@@ -288,7 +312,7 @@ for (const cardData of cardDatas) {
   const imageFile = skillImageFiles.find((file) => file.includes(cardData.ArtKey))
 
   if (!imageFile) {
-    console.error(`Image data not found for ${cardData.InternalName}`)
+    console.error(`Image data not found for skill ${cardData.InternalName}`)
     continue
   }
 
@@ -296,12 +320,57 @@ for (const cardData of cardDatas) {
   if (!fs.existsSync(outFile)) {
     console.log(`Copying image ${skills.length} ${imageFile} to ${outFile}`)
     fs.copyFileSync(imageFile, outFile)
-    const command = `"${magickExe}" "${outFile}" -quality 60 -resize 128x128 "${outFile}"`
+    const command = `"${magickExe}" "${outFile}" -quality 60 -resize 256x256 "${outFile}"`
     nodeCmd.runSync(command)
   }
 
   skills.push(card)
 }
 
+let potentialMonsters = 0
+
+const badMonsterName = /(Battle_?Player|\[|\])/
+const monsters: Monster[] = []
+for (const data of monsterDatas) {
+  if (data.InternalName.match(badMonsterName)) continue
+
+  potentialMonsters += 1
+
+  const simpleName = data.InternalName.replaceAll(' ', '')
+  const imageName1 = `Monster_${simpleName}_Portrait.png`.toLowerCase()
+  const imageName2 = `ENC_Monster_${simpleName}_Char.png`.toLowerCase()
+  const imageFile = allPngFiles.find(
+    (file) => file.toLowerCase().includes(imageName1) || file.toLowerCase().includes(imageName2),
+  )
+
+  if (!imageFile) {
+    // console.error(`Image data not found for monster ${data.InternalName}`)
+    continue
+  }
+
+  const outFile = `${dirname}/../public/images/monsters/${data.Id}.png`
+  if (!fs.existsSync(outFile)) {
+    console.log(`Copying image ${monsters.length} ${imageFile} to ${outFile}`)
+    fs.copyFileSync(imageFile, outFile)
+    const command = `"${magickExe}" "${outFile}" -resize 256x256 "${outFile}"`
+    nodeCmd.runSync(command)
+  }
+
+  monsters.push({
+    id: data.Id,
+    name: data.InternalName,
+    health: data.Player.Attributes.HealthMax,
+    level: data.Player.Attributes.Level,
+    items: data.Player.Hand.Items.map((item) => item.TemplateId),
+    skills: data.Player.Skills.map((item) => item.TemplateId),
+  })
+}
+
+fs.writeFileSync(`${dirname}/../src/data/items.json`, JSON.stringify(items))
+console.log(`Parsed ${items.length}/${potentialItems} items`)
+
 fs.writeFileSync(`${dirname}/../src/data/skills.json`, JSON.stringify(skills))
-console.log(`Parsed ${skills.length}/${potential} skills`)
+console.log(`Parsed ${skills.length}/${potentialSkills} skills`)
+
+fs.writeFileSync(`${dirname}/../src/data/monsters.json`, JSON.stringify(monsters))
+console.log(`Parsed ${monsters.length}/${potentialMonsters} monsters`)

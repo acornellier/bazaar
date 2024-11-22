@@ -112,4 +112,13 @@ export type CardType = 'item' | 'skill'
 export type Item = Card
 export type Skill = Card
 
+export type Monster = {
+  id: string
+  name: string
+  health: number
+  level: number
+  items: string[]
+  skills: string[]
+}
+
 export type IconComponent = IconType

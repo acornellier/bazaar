@@ -42,6 +42,10 @@ export function CardTooltip({ item, selected, attributes, curTier, setCurTier, t
     actives.push(`Multicast: ${attributes.Multicast}`)
   }
 
+  if (attributes.CritChance !== undefined) {
+    passives.push(`Crit chance: ${attributes.CritChance}%`)
+  }
+
   return (
     <div
       ref={ref}

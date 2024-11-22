@@ -8,13 +8,7 @@ import type {
   Tier,
   TierData,
 } from '../data/types.ts'
-import { colors } from './colors.ts'
-import { IoShieldHalfOutline, IoStopwatchOutline } from 'react-icons/io5'
-import { FaBoltLightning, FaBurst, FaRegSnowflake } from 'react-icons/fa6'
-import { ImFire } from 'react-icons/im'
-import { GiDeathSkull, GiHealthNormal, GiHeavyBullets } from 'react-icons/gi'
-import { SlTarget } from 'react-icons/sl'
-import { FaHeart } from 'react-icons/fa'
+import { tagFormatting } from '../data/tags.ts'
 
 export type ActionTypeModifiers = { [key in ActionTypeModifier]?: Attribute }
 
@@ -65,61 +59,19 @@ type AttributeFormatting = {
 }
 
 const attributeFormattings: { [key in Attribute]?: AttributeFormatting } = {
-  BurnApplyAmount: {
-    color: colors.burn,
-    Icon: ImFire,
-  },
-  ChargeAmount: {
-    color: colors.haste,
-    ms: true,
-    Icon: FaBoltLightning,
-  },
-  CooldownMax: {
-    ms: true,
-  },
-  CritChance: {
-    color: colors.crit,
-    Icon: SlTarget,
-  },
-  DamageAmount: {
-    color: colors.damage,
-    Icon: FaBurst,
-  },
-  FreezeAmount: {
-    color: colors.freeze,
-    ms: true,
-    Icon: FaRegSnowflake,
-  },
-  HasteAmount: {
-    color: colors.haste,
-    ms: true,
-    Icon: IoStopwatchOutline,
-  },
-  HealAmount: {
-    color: colors.heal,
-    Icon: GiHealthNormal,
-  },
-  HealthRegen: {
-    color: colors.heal,
-    Icon: FaHeart,
-  },
-  PoisonApplyAmount: {
-    color: colors.poison,
-    Icon: GiDeathSkull,
-  },
-  ReloadAmount: {
-    color: colors.ammo,
-    Icon: GiHeavyBullets,
-  },
-  ShieldApplyAmount: {
-    color: colors.shield,
-    Icon: IoShieldHalfOutline,
-  },
-  SlowAmount: {
-    color: colors.slow,
-    ms: true,
-    Icon: IoStopwatchOutline,
-  },
+  BurnApplyAmount: { ...tagFormatting.Burn },
+  ChargeAmount: { ...tagFormatting.Charge, ms: true },
+  CooldownMax: { ...tagFormatting.Cooldown },
+  CritChance: { ...tagFormatting.Crit },
+  DamageAmount: { ...tagFormatting.Damage },
+  FreezeAmount: { ...tagFormatting.Freeze, ms: true },
+  HasteAmount: { ...tagFormatting.Haste, ms: true },
+  HealAmount: { ...tagFormatting.Heal },
+  HealthRegen: { ...tagFormatting.Heal },
+  PoisonApplyAmount: { ...tagFormatting.Poison },
+  ReloadAmount: { ...tagFormatting.Ammo },
+  ShieldApplyAmount: { ...tagFormatting.Shield },
+  SlowAmount: { ...tagFormatting.Slow, ms: true },
 }
 
 type AttributeResult = {

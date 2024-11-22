@@ -1,7 +1,6 @@
 ﻿import type { Card, CardType, Skill } from '../data/types.ts'
-import { hiddenTags, type Tag, tags } from '../data/tags.ts'
+import { hiddenTags, type Tag, tagFormatting, tags } from '../data/tags.ts'
 import { useEffect, useMemo, useState } from 'react'
-import { useDebounce } from '../util/hooks/useDebounce.ts'
 import { useSetState } from '../util/hooks/useSetState.ts'
 import { type Hero, heroes } from '../data/heroes.ts'
 import { Checkbox } from './Checkbox.tsx'
@@ -14,13 +13,12 @@ interface Props {
 
 export function Filters({ setCards, allCards, type }: Props) {
   const [search, setSearch] = useState('')
-  const debouncedSearch = useDebounce(search, 100)
 
-  const [selectedHeroes, toggleHero] = useSetState<Hero>()
+  const [selectedHeroes, toggleHero] = useSetState<Hero>(['Vanessa'])
   const [selectedTags, toggleTag] = useSetState<Tag>()
 
   const filteredItems = useMemo(() => {
-    const finalSearch = debouncedSearch.toLowerCase()
+    const finalSearch = search.toLowerCase()
     return allCards.filter((card) => {
       const allTags = new Set([...card.tags, ...card.hiddenTags])
       return (
@@ -29,22 +27,22 @@ export function Filters({ setCards, allCards, type }: Props) {
         selectedTags.isSubsetOf(allTags)
       )
     })
-  }, [allCards, debouncedSearch, selectedHeroes, selectedTags])
+  }, [allCards, search, selectedHeroes, selectedTags])
 
   useEffect(() => {
     setCards(filteredItems)
   }, [filteredItems, setCards])
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
       <input
         type="search"
         placeholder={`Search ${filteredItems.length} items...`}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="text-black rounded-sm p-0.5"
+        className="fancy max-w-[300px]"
       />
-      <div className="flex flex-wrap gap-2 items-center">
+      <div className="flex flex-wrap gap-1 items-center">
         <span className="font-bold min-w-20">Heroes</span>
         {heroes.map((hero) => (
           <Checkbox
@@ -56,17 +54,24 @@ export function Filters({ setCards, allCards, type }: Props) {
         ))}
       </div>
       {type === 'item' && (
-        <div className="flex flex-wrap gap-2 items-center">
+        <div className="flex flex-wrap gap-1 items-center">
           <span className="font-bold min-w-20">Tags</span>
           {tags.map((tag) => (
             <Checkbox key={tag} checked={selectedTags.has(tag)} label={tag} toggle={toggleTag} />
           ))}
         </div>
       )}
-      <div className="flex flex-wrap gap-2 items-center">
+      <div className="flex flex-wrap gap-1 items-center">
         <span className="font-bold min-w-20">Attributes</span>
         {hiddenTags.map((tag) => (
-          <Checkbox key={tag} checked={selectedTags.has(tag)} label={tag} toggle={toggleTag} />
+          <Checkbox
+            key={tag}
+            checked={selectedTags.has(tag)}
+            label={tag}
+            toggle={toggleTag}
+            Icon={tagFormatting[tag].Icon}
+            color={tagFormatting[tag].color}
+          />
         ))}
       </div>
     </div>

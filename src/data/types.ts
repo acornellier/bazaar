@@ -2,7 +2,8 @@
 import type { Tag } from './tags.ts'
 import type { Hero } from './heroes.ts'
 
-export type Tier = 'Bronze' | 'Silver' | 'Gold' | 'Diamond'
+export const tiers = ['Bronze', 'Silver', 'Gold', 'Diamond'] as const
+export type Tier = (typeof tiers)[number]
 
 export type Attribute =
   | 'CooldownMax'

@@ -3,15 +3,15 @@ import { Filters } from './components/Filters.tsx'
 import { useState } from 'react'
 import { CardComponent } from './components/Card.tsx'
 import { allSkills } from './data/skills.ts'
-import type { CardType } from './data/types.ts'
+import type { CardType, Item, Skill } from './data/types.ts'
 import { Button } from './components/Button.tsx'
 
 function SkillList() {
-  const [skills, setSkills] = useState(allSkills)
+  const [skills, setSkills] = useState<Skill[]>([])
   const [hoveredId, setHoveredId] = useState<string | null>(null)
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-4">
       <Filters allCards={allSkills} setCards={setSkills} type="skill" />
       <div className="flex gap-1 flex-wrap">
         {skills.map((skill) => (
@@ -29,11 +29,11 @@ function SkillList() {
 }
 
 function ItemList() {
-  const [items, setItems] = useState(allItems)
+  const [items, setItems] = useState<Item[]>([])
   const [hoveredId, setHoveredId] = useState<string | null>(null)
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-4">
       <Filters allCards={allItems} setCards={setItems} type="item" />
       <div className="flex gap-3 flex-wrap">
         {items.map((item) => (

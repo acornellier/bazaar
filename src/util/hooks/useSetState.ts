@@ -1,7 +1,7 @@
 ﻿import { useCallback, useState } from 'react'
 
-export function useSetState<T>() {
-  const [items, setItems] = useState<Set<T>>(new Set())
+export function useSetState<T>(defaultValues?: T[]) {
+  const [items, setItems] = useState<Set<T>>(new Set(defaultValues))
 
   const toggleItem = useCallback((item: T) => {
     setItems((prev) => {

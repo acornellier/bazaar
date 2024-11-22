@@ -70,7 +70,7 @@ function SectionText({ item, tier, section }: SectionTextProps) {
   const formattedValue = formatting?.ms ? value / 1000 : value
   const size = modifier !== 'targets' ? 'text-lg' : ''
   return (
-    <span className={`${formatting?.color}`}>
+    <span className={`${formatting?.color} whitespace-nowrap`}>
       {formatting?.Icon && <formatting.Icon className="inline-block mr-0.5 mb-1" size={20} />}
       <span className={`${size} leading-4 font-serif`}>{formattedValue}</span>
     </span>

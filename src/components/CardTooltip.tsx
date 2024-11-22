@@ -3,6 +3,7 @@ import { PiArrowFatRightDuotone } from 'react-icons/pi'
 import { CardText } from './CardText.tsx'
 import { GiHeavyBullets } from 'react-icons/gi'
 import type { Attributes, CardType, Item, Tier } from '../data/types.ts'
+import { useEffect, useRef, useState } from 'react'
 
 interface Props {
   item: Item
@@ -13,7 +14,24 @@ interface Props {
   type: CardType
 }
 
+interface TooltipPosition {
+  x: 'left' | 'right'
+  y: 'top' | 'bottom'
+}
+
 export function CardTooltip({ item, selected, attributes, curTier, setCurTier, type }: Props) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [position, setPosition] = useState<TooltipPosition | null>(null)
+
+  useEffect(() => {
+    if (!ref.current) return
+
+    const rect = ref.current.getBoundingClientRect()
+    const x = rect.right + 70 > window.innerWidth ? 'right' : 'left'
+    const y = rect.bottom + 70 > window.innerHeight ? 'top' : 'bottom'
+    setPosition({ x, y })
+  }, [])
+
   const curTierData = item.tiers.find((tierData) => tierData.tier === curTier)
 
   const tooltips = item.tooltips.filter((_, idx) => curTierData?.TooltipIds.includes(idx))
@@ -26,8 +44,11 @@ export function CardTooltip({ item, selected, attributes, curTier, setCurTier, t
 
   return (
     <div
+      ref={ref}
       className={`absolute opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto
                   transition-opacity duration-300 z-50
+                  ${position === null ? 'invisible' : ''}
+                  ${position?.x === 'right' ? 'right-0' : ''} ${position?.y === 'top' ? 'bottom-full' : ''}
                   ${selected ? 'opacity-100 pointer-events-auto' : ''}`}
     >
       {type === 'item' && (

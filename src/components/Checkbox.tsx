@@ -1,12 +1,15 @@
 ﻿import { useCallback } from 'react'
+import type { IconComponent } from '../data/types.ts'
 
 interface Props<T extends string> {
   checked: boolean
   label: T
   toggle: (label: T) => void
+  Icon?: IconComponent
+  color?: string
 }
 
-export function Checkbox<T extends string>({ checked, label, toggle }: Props<T>) {
+export function Checkbox<T extends string>({ checked, label, toggle, Icon, color }: Props<T>) {
   const onChange = useCallback(() => {
     toggle(label)
   }, [label, toggle])
@@ -16,9 +19,11 @@ export function Checkbox<T extends string>({ checked, label, toggle }: Props<T>)
   return (
     <div
       role="button"
-      className="flex items-center rounded-lg p-0 transition-all bg-amber-800 hover:bg-amber-600 focus:bg-amber-600 active:bg-amber-600"
+      className={`fancy [&]:p-0 [&]:min-h-0 transition-all 
+                hover:bg-amber-800 focus:bg-amber-800 active:bg-amber-800 
+                ${checked ? '[&]:bg-amber-700' : ''}`}
     >
-      <label htmlFor={id} className="flex w-full cursor-pointer items-center px-3 py-2">
+      <label htmlFor={id} className="flex w-full cursor-pointer items-center px-2 py-1.5">
         <div className="inline-flex items-center">
           <label className="flex items-center cursor-pointer relative" htmlFor={id}>
             <input
@@ -45,9 +50,12 @@ export function Checkbox<T extends string>({ checked, label, toggle }: Props<T>)
               </svg>
             </span>
           </label>
-          <label className="cursor-pointer ml-2 text-white text-sm select-none" htmlFor={id}>
-            {label}
-          </label>
+          <div className={`flex items-center ml-1.5 gap-0.5`}>
+            {Icon && <Icon size={16} className={color} />}
+            <label className="cursor-pointer text-sm select-none" htmlFor={id}>
+              {label}
+            </label>
+          </div>
         </div>
       </label>
     </div>
